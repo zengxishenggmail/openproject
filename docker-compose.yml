@@ -66,6 +66,8 @@ services:
     depends_on:
       - db
       - cache
+    networks:
+      - network
 
   worker:
     <<: *backend
@@ -73,11 +75,15 @@ services:
     depends_on:
       - db
       - cache
+    networks:
+      - network
 
-  frontend:
+  frontend: # Web 服务 (Dokploy 需要识别 Web 服务)
     build:
       <<: *frontend-build
-    command: "node --max_old_space_size=8096 ./node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --public-host ${OPENPROJECT_DEV_URL}"
+    command: "node --max_old_space_size=8096 ./node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --port 80 --public-host ${OPENPROJECT_DEV_URL}" # 修改端口为 80
+    ports: # 映射端口，让 dokploy 可以访问到 Web 服务
+      - "80:80" # 将宿主机的 80 端口映射到容器的 80 端口
     volumes:
       - ".:/home/dev/openproject"
       - "${CKEDITOR_BUILD_DIR:-./frontend/src/vendor/ckeditor/}:/home/dev/openproject/frontend/src/vendor/ckeditor/"
@@ -88,7 +94,7 @@ services:
     depends_on:
       - backend
 
-  db:
+  db: # 数据库服务 (Dokploy 需要识别数据库服务)
     image: postgres:13
     <<: *restart_policy
     stop_grace_period: "3s"
@@ -107,7 +113,7 @@ services:
     networks:
       - network
 
-######### Testing stuff below ############
+######### Testing stuff below (测试相关的服务，部署时可以忽略) ############
 
   db-test:
     image: postgres:13
