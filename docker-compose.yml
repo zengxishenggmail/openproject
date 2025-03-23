@@ -83,7 +83,7 @@ services:
       <<: *frontend-build
     command: "node --max_old_space_size=8096 ./node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --port 80 --public-host ${OPENPROJECT_DEV_URL}" # 修改端口为 80
     ports: # 映射端口，让 dokploy 可以访问到 Web 服务
-      - "80:80" # 将宿主机的 80 端口映射到容器的 80 端口
+      - "8070:80" # 将宿主机的 8070 端口映射到容器的 80 端口
     volumes:
       - ".:/home/dev/openproject"
       - "${CKEDITOR_BUILD_DIR:-./frontend/src/vendor/ckeditor/}:/home/dev/openproject/frontend/src/vendor/ckeditor/"
